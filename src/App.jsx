@@ -15,10 +15,14 @@ const API_BASE_URL = 'http://localhost:5001'
 function App() {
   const [trackerPanelOpen, setTrackerPanelOpen] = useState(false)
   
-  const [peerInfo, setPeerInfo] = useState({
-    peerId: 'peer1',
-    port: 5001,
-    connected: false
+  // Load saved state from localStorage
+  const [peerInfo, setPeerInfo] = useState(() => {
+    const saved = localStorage.getItem('peerInfo')
+    return saved ? JSON.parse(saved) : {
+      peerId: 'peer1',
+      port: 5001,
+      connected: false
+    }
   })
 
   const [sharedFiles, setSharedFiles] = useState([])
@@ -26,6 +30,46 @@ function App() {
   const [activeDownloads, setActiveDownloads] = useState([])
   const [completedFiles, setCompletedFiles] = useState([])
   const [systemLogs, setSystemLogs] = useState([])
+
+  // Save peerInfo to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('peerInfo', JSON.stringify(peerInfo))
+  }, [peerInfo])
+
+  // Function to refresh shared files
+  const refreshSharedFiles = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/start_peer`, {
+        method: 'POST'
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to refresh shared files');
+      }
+
+      const data = await response.json();
+      
+      // Update shared files
+      const formattedSharedFiles = Object.entries(data.shared_files).map(([name, parts]) => ({
+        name,
+        parts,
+        size: 'Calculating...' // You might want to add file size calculation
+      }));
+      setSharedFiles(formattedSharedFiles);
+
+      // Update available files for download
+      const formattedAvailableFiles = data.download_targets.map(name => ({
+        name,
+        parts: 0,
+        peers: []
+      }));
+      setAvailableFiles(formattedAvailableFiles);
+
+      addLog('Shared files refreshed', 'success');
+    } catch (error) {
+      addLog(`Failed to refresh shared files: ${error.message}`, 'error');
+    }
+  }
 
   const addLog = (message, type = 'info') => {
     const newLog = {
@@ -60,8 +104,8 @@ function App() {
       // Update available files for download
       const formattedAvailableFiles = data.download_targets.map(name => ({
         name,
-        parts: 0, // This will be updated when we implement file info fetching
-        peers: [] // This will be updated when we implement peer discovery
+        parts: 0,
+        peers: []
       }));
       setAvailableFiles(formattedAvailableFiles);
 
@@ -89,14 +133,10 @@ function App() {
 
       const data = await response.json();
       
-      const newSharedFile = {
-        name: file.name,
-        parts: data.parts,
-        size: `${(file.size / (1024 * 1024)).toFixed(1)} MB`
-      };
-
-      setSharedFiles(prev => [...prev, newSharedFile]);
-      addLog(`Shared file: ${file.name} (${newSharedFile.parts} parts)`, 'success');
+      // Refresh the shared files list after successful upload
+      await refreshSharedFiles();
+      
+      addLog(`Shared file: ${file.name} (${data.parts} parts)`, 'success');
     } catch (error) {
       addLog(`Failed to share file: ${error.message}`, 'error');
     }
@@ -215,7 +255,7 @@ function App() {
         },
         body: JSON.stringify({
           ip: trackerInfo.ipAddress,
-          port: parseInt(trackerInfo.port)
+          port: trackerInfo.port
         })
       });
 

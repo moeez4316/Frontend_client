@@ -86,7 +86,12 @@ body::before {
 
 .app {
   min-height: 100vh;
-  position: relative;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  overflow-x: hidden;
 }
 
 .header {
@@ -183,17 +188,22 @@ body::before {
 }
 
 .container {
-  max-width: 1400px;
+  flex: 1;
+  width: 100%;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 3rem 2rem;
-  position: relative;
+  padding: 2rem;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 .main-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2.5rem;
-  margin-bottom: 3rem;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .left-column,
@@ -201,17 +211,19 @@ body::before {
   display: flex;
   flex-direction: column;
   gap: 2rem;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .card {
-  background: var(--gradient-card);
-  border-radius: var(--radius);
-  padding: 2rem;
-  box-shadow: var(--shadow);
+  background: var(--bg-secondary);
+  border-radius: var(--radius-lg);
   border: 1px solid var(--border);
-  transition: all 0.3s ease;
-  position: relative;
   overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 1.5rem;
 }
 
 .card::before {
@@ -239,18 +251,15 @@ body::before {
 .card-header {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  margin-bottom: 2rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 1px solid var(--border);
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
 }
 
 .card-title {
   font-size: 1.25rem;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--text-primary);
   margin: 0;
-  letter-spacing: -0.025em;
 }
 
 .status-indicator {
@@ -296,14 +305,14 @@ body::before {
   justify-content: space-between;
   align-items: center;
   padding: 1.25rem;
-  background: var(--bg-secondary);
+  background: var(--bg-tertiary);
   border-radius: var(--radius-sm);
   border: 1px solid var(--border);
   transition: all 0.3s ease;
 }
 
 .peer-info-item:hover {
-  background: var(--bg-tertiary);
+  background: var(--bg-card);
   border-color: var(--border-accent);
   transform: translateX(4px);
 }
@@ -396,56 +405,36 @@ body::before {
 
 .file-list {
   list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+  padding: 0;
+  margin: 0;
 }
 
 .file-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1.5rem;
+  padding: 1rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-primary);
   border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
-  background: var(--bg-secondary);
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
+  margin-bottom: 0.5rem;
 }
 
-.file-item::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 4px;
-  background: var(--gradient-primary);
-  transform: scaleY(0);
-  transition: transform 0.3s ease;
-}
-
-.file-item:hover::before {
-  transform: scaleY(1);
-}
-
-.file-item:hover {
-  background: var(--bg-tertiary);
-  transform: translateX(8px);
-  box-shadow: var(--shadow);
+.file-item:last-child {
+  margin-bottom: 0;
+  border-bottom: none;
 }
 
 .file-info h4 {
   font-size: 0.875rem;
-  font-weight: 700;
+  font-weight: 600;
+  margin: 0 0 0.25rem 0;
   color: var(--text-primary);
-  margin-bottom: 0.5rem;
 }
 
 .file-meta {
   font-size: 0.75rem;
-  color: var(--text-muted);
+  color: var(--text-secondary);
 }
 
 .sharing-badge {
@@ -721,33 +710,12 @@ body::before {
 }
 
 .log-item {
-  padding: 1rem 1.5rem;
-  border-bottom: 1px solid var(--border);
-  font-size: 0.75rem;
   display: flex;
-  gap: 1rem;
-  transition: all 0.3s ease;
-  position: relative;
-}
-
-.log-item::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 3px;
-  background: var(--primary);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.log-item:hover::before {
-  opacity: 1;
-}
-
-.log-item:hover {
-  background: var(--bg-tertiary);
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.875rem;
 }
 
 .log-item:last-child {
@@ -756,33 +724,48 @@ body::before {
 
 .log-timestamp {
   color: var(--text-muted);
-  font-family: 'SF Mono', Monaco, monospace;
-  min-width: 80px;
-  font-weight: 600;
+  font-size: 0.75rem;
 }
 
 .log-message {
   flex: 1;
+}
+
+.log-type {
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
   font-weight: 500;
 }
 
-.log-success { color: var(--success); }
-.log-info { color: var(--primary-light); }
-.log-warning { color: var(--warning); }
-.log-error { color: var(--danger); }
+.log-type.success {
+  background: var(--success-light);
+  color: var(--success);
+}
+
+.log-type.error {
+  background: var(--error-light);
+  color: var(--error);
+}
+
+.log-type.info {
+  background: var(--info-light);
+  color: var(--info);
+}
 
 .empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
   text-align: center;
-  padding: 4rem 2rem;
-  color: var(--text-muted);
-  font-size: 0.875rem;
+  color: var(--text-secondary);
 }
 
 .empty-state-icon {
-  margin: 0 auto 1.5rem;
-  display: block;
-  color: var(--border-light);
-  opacity: 0.5;
+  margin-bottom: 1rem;
+  color: var(--text-muted);
 }
 
 /* Luxury Tracker Configuration Panel */
@@ -876,42 +859,25 @@ body::before {
 }
 
 .form-group {
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
 }
 
-.form-label {
+.form-group label {
   display: block;
+  margin-bottom: 0.5rem;
   font-size: 0.875rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  font-weight: 500;
+  color: var(--text-secondary);
 }
 
-.form-input {
+.form-group input {
   width: 100%;
-  padding: 1.25rem 1.5rem;
+  padding: 0.75rem;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  background: var(--bg-input);
-  font-size: 0.875rem;
+  background: var(--bg-primary);
   color: var(--text-primary);
-  transition: all 0.3s ease;
-  font-weight: 500;
-}
-
-.form-input:focus {
-  outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.2);
-  background: var(--bg-tertiary);
-  transform: translateY(-2px);
-}
-
-.form-input::placeholder {
-  color: var(--text-muted);
-  font-weight: 400;
+  font-size: 0.875rem;
 }
 
 .connection-status-card {
@@ -953,17 +919,21 @@ body::before {
 .status-message.loading { color: var(--primary); }
 
 .spinner {
-  width: 18px;
-  height: 18px;
-  border: 2px solid var(--border);
-  border-top: 2px solid var(--primary);
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
   border-radius: 50%;
-  animation: luxurySpin 1s linear infinite;
+  border-top-color: white;
+  animation: spin 1s linear infinite;
+  margin-right: 8px;
+  display: inline-block;
+  vertical-align: middle;
 }
 
-@keyframes luxurySpin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Responsive Design */
@@ -981,7 +951,7 @@ body::before {
 
 @media (max-width: 768px) {
   .container {
-    padding: 2rem 1rem;
+    padding: 1rem;
   }
   
   .header-content {
@@ -989,7 +959,7 @@ body::before {
   }
   
   .card {
-    padding: 1.5rem;
+    padding: 1rem;
   }
   
   .download-header {
@@ -1050,4 +1020,150 @@ body::before {
 ::selection {
   background: rgba(139, 92, 246, 0.3);
   color: var(--text-primary);
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: var(--bg-primary);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.modal-header h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
+}
+
+.close-button:hover {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.modal form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.modal .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.modal .form-group label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.modal .form-group input {
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+}
+
+.modal .form-group input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px var(--primary-light);
+}
+
+.modal .form-group input::placeholder {
+  color: var(--text-muted);
+}
+
+.modal button[type="submit"] {
+  background: var(--gradient-primary);
+  color: white;
+  border: none;
+  padding: 0.75rem;
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modal button[type="submit"]:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow);
+}
+
+.modal button[type="submit"]:active {
+  transform: translateY(0);
+}
+
+/* Connection Status Styles */
+.connection-status {
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.875rem;
+}
+
+.connection-status.success {
+  background: var(--success-light);
+  color: var(--success);
+}
+
+.connection-status.error {
+  background: var(--error-light);
+  color: var(--error);
+}
+
+.connection-status.loading {
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+}
+
+/* System Logs Styles */
+.system-logs {
+  margin-top: 2rem;
+  padding: 1rem;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
 }

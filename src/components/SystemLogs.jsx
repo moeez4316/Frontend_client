@@ -2,7 +2,7 @@ import { Terminal } from 'lucide-react'
 
 function SystemLogs({ logs }) {
   return (
-    <div className="card">
+    <div className="system-logs">
       <div className="card-header">
         <Terminal size={20} />
         <h2 className="card-title">System Logs</h2>

@@ -1,19 +1,23 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { X, Wifi, CheckCircle, AlertCircle } from 'lucide-react'
 
-function TrackerPanel({ isOpen, onClose, onConnect }) {
-  const [ipAddress, setIpAddress] = useState('192.168.0.100')
-  const [port, setPort] = useState('8080')
+function TrackerPanel({ isOpen, onClose, onConnect, initialTrackerInfo }) {
+  const [trackerInfo, setTrackerInfo] = useState({
+    ipAddress: initialTrackerInfo?.ipAddress || '127.0.0.1',
+    port: initialTrackerInfo?.port || 9000
+  })
   const [connectionStatus, setConnectionStatus] = useState(null) // null, 'loading', 'success', 'error'
   const [statusMessage, setStatusMessage] = useState('')
 
-  const handleConnect = async () => {
-    if (!ipAddress || !port) {
-      setConnectionStatus('error')
-      setStatusMessage('Please fill in both IP address and port')
-      return
+  // Update local state when initialTrackerInfo changes
+  useEffect(() => {
+    if (initialTrackerInfo) {
+      setTrackerInfo(initialTrackerInfo)
     }
+  }, [initialTrackerInfo])
 
+  const handleSubmit = async (e) => {
+    e.preventDefault()
     setConnectionStatus('loading')
     setStatusMessage('Connecting to tracker...')
 
@@ -24,24 +28,21 @@ function TrackerPanel({ isOpen, onClose, onConnect }) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          ip: ipAddress,
-          port: parseInt(port)
+          ip: trackerInfo.ipAddress,
+          port: trackerInfo.port
         })
       });
 
-      const data = await response.json();
-      
-      if (response.ok) {
-        setConnectionStatus('success')
-        setStatusMessage(`Successfully connected to tracker at ${ipAddress}:${port}`)
-        onConnect({ ipAddress, port, connected: true })
-      } else {
-        setConnectionStatus('error')
-        setStatusMessage(data.error || 'Failed to connect to tracker. Please check the IP address and port.')
+      if (!response.ok) {
+        throw new Error('Failed to connect to tracker');
       }
+
+      setConnectionStatus('success')
+      setStatusMessage(`Successfully connected to tracker at ${trackerInfo.ipAddress}:${trackerInfo.port}`)
+      onConnect(trackerInfo)
     } catch (error) {
       setConnectionStatus('error')
-      setStatusMessage('Connection failed. Please try again.')
+      setStatusMessage(error.message)
     }
   }
 
@@ -51,58 +52,46 @@ function TrackerPanel({ isOpen, onClose, onConnect }) {
     onClose()
   }
 
+  if (!isOpen) return null
+
   return (
-    <>
-      <div 
-        className={`tracker-panel-overlay ${isOpen ? 'open' : ''}`}
-        onClick={handleClose}
-      />
-      <div className={`tracker-panel ${isOpen ? 'open' : ''}`}>
-        <div className="tracker-panel-header">
-          <h2 className="tracker-panel-title">Configure Tracker</h2>
-          <button 
-            className="tracker-panel-close"
-            onClick={handleClose}
-          >
+    <div className="modal-overlay" onClick={handleClose}>
+      <div className="modal" onClick={e => e.stopPropagation()}>
+        <div className="modal-header">
+          <h2>Configure Tracker</h2>
+          <button onClick={handleClose} className="close-button">
             <X size={20} />
           </button>
         </div>
         
-        <div className="tracker-panel-content">
+        <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label className="form-label" htmlFor="ip-address">
-              IP Address
-            </label>
+            <label htmlFor="ipAddress">IP Address:</label>
             <input
-              id="ip-address"
               type="text"
-              className="form-input"
-              placeholder="192.168.0.100"
-              value={ipAddress}
-              onChange={(e) => setIpAddress(e.target.value)}
+              id="ipAddress"
+              value={trackerInfo.ipAddress}
+              onChange={(e) => setTrackerInfo(prev => ({ ...prev, ipAddress: e.target.value }))}
+              placeholder="Enter tracker IP address"
+              required
             />
           </div>
           
           <div className="form-group">
-            <label className="form-label" htmlFor="port">
-              Port
-            </label>
+            <label htmlFor="port">Port:</label>
             <input
-              id="port"
               type="number"
-              className="form-input"
-              placeholder="8080"
-              value={port}
-              onChange={(e) => setPort(e.target.value)}
+              id="port"
+              value={trackerInfo.port}
+              onChange={(e) => setTrackerInfo(prev => ({ ...prev, port: parseInt(e.target.value) }))}
+              placeholder="Enter tracker port"
+              min="1"
+              max="65535"
+              required
             />
           </div>
           
-          <button 
-            className="btn btn-primary"
-            onClick={handleConnect}
-            disabled={connectionStatus === 'loading'}
-            style={{ width: '100%' }}
-          >
+          <button type="submit" className="primary" disabled={connectionStatus === 'loading'}>
             {connectionStatus === 'loading' ? (
               <>
                 <div className="spinner" />
@@ -115,20 +104,17 @@ function TrackerPanel({ isOpen, onClose, onConnect }) {
               </>
             )}
           </button>
-          
-          {connectionStatus && (
-            <div className={`connection-status-card ${connectionStatus}`}>
-              <div className={`status-message ${connectionStatus}`}>
-                {connectionStatus === 'loading' && <div className="spinner" />}
-                {connectionStatus === 'success' && <CheckCircle size={16} />}
-                {connectionStatus === 'error' && <AlertCircle size={16} />}
-                {statusMessage}
-              </div>
-            </div>
-          )}
-        </div>
+        </form>
+        
+        {connectionStatus && (
+          <div className={`connection-status ${connectionStatus}`}>
+            {connectionStatus === 'success' && <CheckCircle size={16} />}
+            {connectionStatus === 'error' && <AlertCircle size={16} />}
+            {statusMessage}
+          </div>
+        )}
       </div>
-    </>
+    </div>
   )
 }
 
