@@ -15,6 +15,12 @@ const API_BASE_URL = 'http://localhost:5001'
 function App() {
   const [trackerPanelOpen, setTrackerPanelOpen] = useState(false)
   
+  // Initialize theme
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme') || 'light'
+    document.documentElement.setAttribute('data-theme', savedTheme)
+  }, [])
+  
   // Load saved state from localStorage
   const [peerInfo, setPeerInfo] = useState(() => {
     const saved = localStorage.getItem('peerInfo')

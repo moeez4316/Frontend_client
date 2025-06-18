@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { X, Wifi, CheckCircle, AlertCircle } from 'lucide-react'
+import { X, Wifi, CheckCircle, AlertCircle, Server } from 'lucide-react'
 
 function TrackerPanel({ isOpen, onClose, onConnect, initialTrackerInfo }) {
   const [trackerInfo, setTrackerInfo] = useState({
@@ -58,7 +58,10 @@ function TrackerPanel({ isOpen, onClose, onConnect, initialTrackerInfo }) {
     <div className="modal-overlay" onClick={handleClose}>
       <div className="modal" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
-          <h2>Configure Tracker</h2>
+          <div className="modal-title">
+            <Server size={24} />
+            <h2>Configure Tracker</h2>
+          </div>
           <button onClick={handleClose} className="close-button">
             <X size={20} />
           </button>
@@ -91,7 +94,7 @@ function TrackerPanel({ isOpen, onClose, onConnect, initialTrackerInfo }) {
             />
           </div>
           
-          <button type="submit" className="primary" disabled={connectionStatus === 'loading'}>
+          <button type="submit" className="btn btn-primary" disabled={connectionStatus === 'loading'}>
             {connectionStatus === 'loading' ? (
               <>
                 <div className="spinner" />
@@ -107,7 +110,7 @@ function TrackerPanel({ isOpen, onClose, onConnect, initialTrackerInfo }) {
         </form>
         
         {connectionStatus && (
-          <div className={`connection-status ${connectionStatus}`}>
+          <div className={`alert alert-${connectionStatus === 'success' ? 'success' : 'error'}`}>
             {connectionStatus === 'success' && <CheckCircle size={16} />}
             {connectionStatus === 'error' && <AlertCircle size={16} />}
             {statusMessage}
