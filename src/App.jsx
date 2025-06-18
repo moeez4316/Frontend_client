@@ -19,7 +19,7 @@ function App() {
   const [peerInfo, setPeerInfo] = useState(() => {
     const saved = localStorage.getItem('peerInfo')
     return saved ? JSON.parse(saved) : {
-      peerId: 'peer1',
+      peerId: 'Moeez_Ahmed',
       port: 5001,
       connected: false
     }
@@ -193,15 +193,30 @@ function App() {
                   }, ...prev]);
                   setActiveDownloads(prev => prev.filter(d => d.fileName !== fileName));
                   addLog(`Download completed: ${fileName}`, 'success');
+                } else if (progressData.status === 'error') {
+                  clearInterval(progressInterval);
+                  setActiveDownloads(prev => prev.filter(d => d.fileName !== fileName));
+                  addLog(`Download failed: ${fileName}`, 'error');
+                } else if (progressData.status === 'cancelled') {
+                  clearInterval(progressInterval);
+                  setActiveDownloads(prev => prev.filter(d => d.fileName !== fileName));
+                  addLog(`Download cancelled: ${fileName}`, 'warning');
                 }
 
                 return updatedDownload;
               }
               return download;
             }));
+          } else if (progressResponse.status === 404) {
+            // Download not found, stop polling
+            clearInterval(progressInterval);
+            setActiveDownloads(prev => prev.filter(d => d.fileName !== fileName));
+            addLog(`Download not found: ${fileName}`, 'error');
           }
         } catch (error) {
           console.error('Error checking download progress:', error);
+          // Don't stop polling on network errors, just log them
+          addLog(`Network error checking progress: ${error.message}`, 'error');
         }
       }, 1000);
     } catch (error) {
